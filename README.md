@@ -37,8 +37,8 @@ This project is static HTML/CSS/JS, so no backend or build step is required.
 
 ### 1) Clone the repository
 ```powershell
-git clone https://github.com/litch07/optiwatt-frontend.git
-cd optiwatt-frontend
+git clone https://github.com/litch07/optiwatt-ui.git
+cd optiwatt-ui
 ```
 
 ### 2) Open the app
