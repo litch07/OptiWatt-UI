@@ -78,5 +78,6 @@ If you plan to add a backend later, here are clean integration points:
 ## Credits
 Designed and built by **Sadid Ahmed** for an electronics lab project UI showcase.
 
-## License
-MIT License. See `LICENSE`.
+## 📄 License
+
+MIT License. See [LICENSE](LICENSE).
