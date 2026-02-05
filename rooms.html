@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms - OptiWatt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#16A34A',
+                        secondary: '#F97316',
+                        accent: '#F59E0B'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+
+<!-- Global Header -->
+<header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40">
+    <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+            <a id="brandLink" href="dashboard.html" class="flex items-center space-x-3">`n                <img src="logo.png" alt="OptiWatt logo" class="logo-img">`n                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">OptiWatt</h1>`n            </a>
+            <div class="flex items-center space-x-2 md:space-x-3">
+                <button id="themeToggle" onclick="toggleTheme()" class="header-icon-btn" title="Toggle Theme">
+                    <span class="icon-size">🌙</span>
+                    <span class="header-icon-label" id="themeLabel">Dark Mode</span>
+                </button>
+                <button onclick="toggleNotificationsPanel()" class="header-icon-btn relative" title="Notifications">
+                    <span class="icon-size">🔔</span>
+                    <span class="header-icon-label">Notifications</span>
+                </button>
+                <button onclick="openSettingsModal()" class="header-icon-btn" title="Settings">
+                    <span class="icon-size">⚙️</span>
+                    <span class="header-icon-label">Settings</span>
+                </button>
+                <button id="profileMenuBtn" onclick="toggleProfileMenu()" class="header-icon-btn" title="Profile">
+                    <span class="icon-size">👤</span>
+                    <span class="header-icon-label">Profile</span>
+                </button>
+                <div id="profileMenu" class="hidden absolute top-20 right-4 bg-white dark:bg-gray-800 rounded-xl shadow-xl p-4 border border-gray-200 dark:border-gray-700 z-50">
+                    <div class="flex items-center space-x-3 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                        <div class="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-xl">A</div>
+                        <div>
+                            <p id="profileName" class="font-bold text-gray-800 dark:text-white">Admin</p>
+                            <p id="profileEmail" class="text-sm text-gray-600 dark:text-gray-400">admin@example.com</p>
+                        </div>
+                    </div>
+                    <button onclick="confirmLogout()" class="w-full text-left px-4 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 font-semibold transition">🚪 Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Notifications Panel -->
+<div id="notificationsPanel" class="hidden fixed top-20 right-4 z-50 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4">
+    <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-3">📬 Notifications</h3>
+    <div class="space-y-2 max-h-96 overflow-y-auto">
+        <p class="text-gray-600 dark:text-gray-400 text-sm">No new notifications</p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<main class="container mx-auto px-4 py-8">
+    <!-- Rooms List View -->
+    <div id="roomsListView">
+        <button onclick="goBack()" class="page-back-btn mb-6">← Back</button>
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-white">🏠 Manage Rooms</h2>
+            <button onclick="openAddRoomModal()" class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition">
+                + Add Room
+            </button>
+        </div>
+        <div id="roomsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <!-- Room Details View -->
+    <div id="roomDetailsView" class="hidden">
+        <button onclick="goBack()" class="page-back-btn mb-6">← Back</button>
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center space-x-4">
+                <h2 id="roomDetailsName" class="text-3xl font-bold text-gray-800 dark:text-white">Room Name</h2>
+                <button onclick="openEditRoomNameModal()" class="px-3 py-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition text-sm font-semibold">
+                    ✏️ Edit Name
+                </button>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="openRoomExportModal()" class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-white font-semibold rounded-lg transition">
+                    📊 Export Logs
+                </button>
+                <button onclick="openDeleteRoomModal()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition">
+                    🗑️ Delete Room
+                </button>
+            </div>
+        </div>
+
+        <!-- Room Stats & Controls -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm font-semibold">Current Power</p>
+                        <p id="roomCurrentPower" class="text-3xl font-bold text-primary mt-2">0 W</p>
+                    </div>
+                    <div class="text-4xl">⚡</div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm font-semibold">Tracking Type</p>
+                        <p id="roomTrackingType" class="text-xl font-bold text-gray-800 dark:text-white mt-2">Daily</p>
+                    </div>
+                    <div class="text-4xl">📊</div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm font-semibold">Occupancy</p>
+                        <div id="roomOccupancy" class="flex items-center mt-2">
+                            <span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span>
+                            <span class="text-lg font-bold text-gray-800 dark:text-white">Occupied</span>
+                        </div>
+                    </div>
+                    <div class="text-4xl">👤</div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm font-semibold">Appliances</p>
+                        <p id="roomApplianceCount" class="text-3xl font-bold text-secondary mt-2">0</p>
+                    </div>
+                    <div class="text-4xl">💡</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Microcontroller Info with Edit -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <span class="text-2xl mr-3">🖥️</span>
+                    <div>
+                        <p class="text-sm font-semibold text-blue-800 dark:text-blue-200">Microcontroller ID</p>
+                        <p id="roomMicrocontrollerId" class="text-lg font-bold text-blue-900 dark:text-blue-100">N/A</p>
+                    </div>
+                </div>
+                <button onclick="openEditMicrocontrollerModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition text-sm">
+                    ✏️ Edit MCU ID
+                </button>
+            </div>
+        </div>
+
+        <!-- Goal Progress -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">📊 Goal Progress</h3>
+            <div id="roomGoalProgressContent"></div>
+        </div>
+
+        <!-- Appliance Cost Analysis (NEW) -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">💰 Appliance Cost Analysis</h3>
+            <div id="applianceCostAnalysis"></div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <button onclick="openSetGoalsModal()" class="px-4 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition">
+                🎯 Set Room Goals
+            </button>
+            <button onclick="toggleRoomOccupancy()" class="px-4 py-3 bg-accent hover:bg-accent/90 text-white font-semibold rounded-lg transition">
+                🚪 Toggle Occupancy
+            </button>
+            <button onclick="toggleRoomAutomation()" id="roomAutomationBtn" class="px-4 py-3 bg-secondary hover:bg-secondary/90 text-white font-semibold rounded-lg transition">
+                🤖 Room Automation: OFF
+            </button>
+            <button onclick="openResetRoomDataModal()" class="px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition">
+                🔄 Reset Data
+            </button>
+        </div>
+
+        <!-- Appliances Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-white">💡 Appliances</h3>
+                <button onclick="openAddApplianceModal()" class="px-4 py-2 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition">
+                    + Add Appliance
+                </button>
+            </div>
+            <div id="appliancesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+    </div>
+</main>
+
+<!-- Add Room Modal -->
+<div id="addRoomModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Add New Room</h3>
+        <form id="addRoomForm" onsubmit="saveNewRoom(event)">
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Room Name</label>
+                <input type="text" id="newRoomName" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Microcontroller ID</label>
+                <input type="text" id="newRoomMicrocontrollerId" placeholder="e.g., ESP32_001" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Unique ID for data retrieval from database</p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Tracking Type</label>
+                <select id="newRoomTracking" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+                    <option value="daily">Daily</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="both">Both</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Daily Goal (kWh)</label>
+                <input type="number" id="newRoomDailyGoal" step="0.1" min="0" value="15.0" oninput="updateNewRoomGoalCost()" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">≈ $<span id="newDailyGoalCost">2.25</span></p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Monthly Goal (kWh)</label>
+                <input type="number" id="newRoomMonthlyGoal" step="1" min="0" value="450" oninput="updateNewRoomGoalCost()" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">≈ $<span id="newMonthlyGoalCost">67.50</span></p>
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Password Required</label>
+                <input type="password" id="addRoomPassword" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+                <p class="text-xs text-yellow-600 dark:text-yellow-400 mt-1">⚠️ Contact helpdesk@optiwatt.com to avoid data risks</p>
+            </div>
+            <div class="flex space-x-4">
+                <button type="button" onclick="closeAddRoomModal()" class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 transition">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition">Add Room</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Room Name Modal -->
+<div id="editRoomNameModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-md w-full">
+        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Edit Room Name</h3>
+        <form id="editRoomNameForm" onsubmit="saveRoomName(event)">
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Room Name</label>
+                <input type="text" id="editRoomNameInput" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+            </div>
+            <div class="flex space-x-4">
+                <button type="button" onclick="closeEditRoomNameModal()" class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 transition">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Microcontroller ID Modal (NEW) -->
+<div id="editMicrocontrollerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-md w-full">
+        <h3 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">⚠️ Edit Microcontroller ID</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-4">Changing the MCU ID will affect data retrieval from the database. Proceed with caution.</p>
+        <p class="text-sm text-yellow-600 dark:text-yellow-400 mb-6">Contact helpdesk@optiwatt.com if uncertain.</p>
+        <form id="editMicrocontrollerForm" onsubmit="saveMicrocontrollerId(event)">
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">New Microcontroller ID</label>
+                <input type="text" id="editMicrocontrollerInput" placeholder="e.g., ESP32_002" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Enter Password to Confirm</label>
+                <input type="password" id="editMicrocontrollerPassword" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+            </div>
+            <div class="flex space-x-4">
+                <button type="button" onclick="closeEditMicrocontrollerModal()" class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 transition">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition">Update ID</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Set Goals Modal -->
+<div id="setGoalsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-md w-full">
+        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Set Room Goals</h3>
+        <form id="setGoalsForm" onsubmit="saveRoomGoals(event)">
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Tracking Type</label>
+                <select id="editTrackingType" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+                    <option value="daily">Daily</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="both">Both</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Daily Goal (kWh)</label>
+                <input type="number" id="editDailyGoal" step="0.1" min="0" oninput="updateGoalCostDisplay()" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">≈ $<span id="editDailyGoalCost">0.00</span></p>
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Monthly Goal (kWh)</label>
+                <input type="number" id="editMonthlyGoal" step="1" min="0" oninput="updateGoalCostDisplay()" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">≈ $<span id="editMonthlyGoalCost">0.00</span></p>
+            </div>
+            <div class="flex space-x-4">
+                <button type="button" onclick="closeSetGoalsModal()" class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 transition">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition">Save Goals</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add Appliance Modal -->
+<div id="addApplianceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-md w-full">
+        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Add Appliance</h3>
+        <form id="addApplianceForm" onsubmit="saveAppliance(event)">
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Appliance Name</label>
+                <input type="text" id="applianceName" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Relay Channel</label>
+                <input type="number" id="relayChannel" step="1" min="1" max="16" value="1" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">PZEM Address</label>
+                <input type="text" id="pzemAddress" value="0x01" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+            </div>
+            <div class="mb-4">
+                <label class="flex items-center">
+                    <input type="checkbox" id="applianceAutomation" checked class="w-5 h-5 mr-2">
+                    <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Enable Automation</span>
+                </label>
+            </div>
+            <div class="mb-6">
+                <label class="flex items-center">
+                    <input type="checkbox" id="applianceSleepExempt" class="w-5 h-5 mr-2">
+                    <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Sleep Mode Exempt</span>
+                </label>
+            </div>
+            <div class="flex space-x-4">
+                <button type="button" onclick="closeAddApplianceModal()" class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 transition">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition">Add</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Appliance Modal (NEW) -->
+<div id="editApplianceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-md w-full">
+        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Edit Appliance</h3>
+        <form id="editApplianceForm" onsubmit="saveEditedAppliance(event)">
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Appliance Name</label>
+                <input type="text" id="editApplianceName" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Relay Channel</label>
+                <input type="number" id="editRelayChannel" step="1" min="1" max="16" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">PZEM Address</label>
+                <input type="text" id="editPzemAddress" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+            </div>
+            <div class="flex space-x-4">
+                <button type="button" onclick="closeEditApplianceModal()" class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 transition">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Reset Appliance Data Modal (NEW) -->
+<div id="resetApplianceDataModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-md w-full">
+        <h3 class="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-4">🔄 Reset Appliance Data</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-6">This will clear runtime data for this appliance only.</p>
+        <div class="flex space-x-4">
+            <button type="button" onclick="closeResetApplianceDataModal()" class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 transition">Cancel</button>
+            <button onclick="confirmResetApplianceData()" class="flex-1 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg transition">Reset Data</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Room Modal -->
+<div id="deleteRoomModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-md w-full">
+        <h3 class="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">⚠️ Delete Room</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-4">This will permanently remove this room and all its appliances. This action cannot be undone.</p>
+        <p class="text-sm text-yellow-600 dark:text-yellow-400 mb-6">Contact helpdesk@optiwatt.com to avoid data risks.</p>
+        <form id="deleteRoomForm" onsubmit="confirmDeleteRoom(event)">
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Enter Password to Confirm</label>
+                <input type="password" id="deleteRoomPassword" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+            </div>
+            <div class="flex space-x-4">
+                <button type="button" onclick="closeDeleteRoomModal()" class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 transition">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition">Delete Room</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Reset Room Data Modal -->
+<div id="resetRoomDataModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-md w-full">
+        <h3 class="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-4">🔄 Reset Room Data</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-6">This will clear runtime data for all appliances in this room. Appliances will not be removed.</p>
+        <form id="resetRoomDataForm" onsubmit="confirmResetRoomData(event)">
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Enter Password to Confirm</label>
+                <input type="password" id="resetRoomDataPassword" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+            </div>
+            <div class="flex space-x-4">
+                <button type="button" onclick="closeResetRoomDataModal()" class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 transition">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg transition">Reset Data</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Room Export Modal -->
+<div id="roomExportModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-md w-full">
+        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">📊 Export Room Logs</h3>
+        <div class="space-y-4">
+            <button onclick="exportRoomToCSV()" class="w-full px-6 py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition flex items-center justify-center">
+                <span class="text-2xl mr-3">📥</span>
+                Export to CSV
+            </button>
+            <button onclick="printRoomReport()" class="w-full px-6 py-4 bg-secondary hover:bg-secondary/90 text-white font-bold rounded-lg transition flex items-center justify-center">
+                <span class="text-2xl mr-3">🖨️</span>
+                Print Report
+            </button>
+            <button type="button" onclick="closeRoomExportModal()" class="w-full px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 transition">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="settings-modal-container">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gray-50 dark:bg-gray-900 p-6 overflow-y-auto">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-6">⚙️ Settings</h2>
+            <div class="space-y-2">
+                <button onclick="switchSettingsTab('password')" class="settings-tab-btn active" data-tab="password">
+                    <span class="mr-3 text-xl">🔒</span> Password
+                </button>
+                <button onclick="switchSettingsTab('automation')" class="settings-tab-btn" data-tab="automation">
+                    <span class="mr-3 text-xl">🤖</span> Automation
+                </button>
+                <button onclick="switchSettingsTab('energyCost')" class="settings-tab-btn" data-tab="energyCost">
+                    <span class="mr-3 text-xl">💰</span> Energy Cost
+                </button>
+                <button onclick="switchSettingsTab('notifications')" class="settings-tab-btn" data-tab="notifications">
+                    <span class="mr-3 text-xl">🔔</span> Notifications
+                </button>
+                <button onclick="switchSettingsTab('exportLogs')" class="settings-tab-btn" data-tab="exportLogs">
+                    <span class="mr-3 text-xl">📊</span> Export Logs
+                </button>
+                <button onclick="switchSettingsTab('reset')" class="settings-tab-btn" data-tab="reset">
+                    <span class="mr-3 text-xl">🔄</span> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 bg-white dark:bg-gray-800 p-8 overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="settingsTitle" class="text-2xl font-bold text-gray-800 dark:text-white">Password</h3>
+                <button onclick="closeSettingsModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-3xl">&times;</button>
+            </div>
+
+            <!-- Password Tab -->
+            <div id="passwordTab" class="settings-content">
+                <form id="passwordForm" onsubmit="changePassword(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Current Password</label>
+                        <input type="password" id="currentPassword" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">New Password</label>
+                        <input type="password" id="newPassword" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required minlength="6">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required minlength="6">
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg transition">
+                        Change Password
+                    </button>
+                </form>
+            </div>
+
+            <!-- Automation Tab (FIXED Layout) -->
+    <div id="automationTab" class="settings-content hidden">
+        <div class="space-y-4">
+            <!-- Global Automation (FIXED - consistent with other items) -->
+            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <div>
+                    <h4 class="font-bold text-gray-800 dark:text-white">Global Automation</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Enable smart automation features</p>
+                </div>
+                <div id="globalAutomationToggle" class="toggle-switch" onclick="toggleGlobalAutomation()"></div>
+            </div>
+
+            <!-- Vacancy Sleep -->
+            <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <div>
+                        <h4 class="font-bold text-gray-800 dark:text-white">Vacancy Sleep</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Auto-sleep devices in vacant rooms</p>
+                    </div>
+                    <div id="vacancySleepToggle" class="toggle-switch" onclick="toggleVacancySleep()"></div>
+                </div>
+                <div id="vacancyTimer" class="mt-4 hidden">
+                    <label class="text-sm text-gray-600 dark:text-gray-400">Delay: <span id="vacancyTimerValue">10</span> minutes</label>
+                    <input type="range" min="5" max="60" step="5" value="10" oninput="updateVacancyTimer(this.value)" class="w-full mt-2">
+                </div>
+            </div>
+
+            <!-- Scheduled Sleep -->
+            <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <div>
+                        <h4 class="font-bold text-gray-800 dark:text-white">Scheduled Sleep</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Auto-sleep during specific hours</p>
+                    </div>
+                    <div id="scheduledSleepToggle" class="toggle-switch" onclick="toggleScheduledSleep()"></div>
+                </div>
+                <div id="scheduledSleepConfig" class="mt-4 hidden space-y-3">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm text-gray-600 dark:text-gray-400">Start Time</label>
+                            <input type="time" id="sleepStartTime" value="22:00" onchange="updateSleepSchedule()" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white mt-1">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600 dark:text-gray-400">End Time</label>
+                            <input type="time" id="sleepEndTime" value="06:00" onchange="updateSleepSchedule()" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white mt-1">
+                        </div>
+                    </div>
+                    <button onclick="toggleExemptionsSection()" class="text-primary hover:text-primary/80 text-sm font-semibold">
+                        Manage Device Exemptions
+                    </button>
+                    <div id="sleepExemptions" class="hidden mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                        <h5 class="font-semibold text-gray-800 dark:text-white mb-3">Exempt Devices</h5>
+                        <div id="sleepExemptDevicesList" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+                <!-- Energy Cost Tab -->
+                <div id="energyCostTab" class="settings-content hidden">
+                    <div class="p-6 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-gray-800 dark:text-white">Current Rate</h4>
+                            <span class="text-3xl font-bold text-primary">$0.15 <span class="text-base text-gray-600 dark:text-gray-400">/ kWh</span></span>
+                        </div>
+                        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mt-4">
+                            <p class="text-sm text-yellow-800 dark:text-yellow-200">
+                                <strong>Note:</strong> Energy costs are currently fixed. To update pricing, please contact the help desk.
+                            </p>
+                            <p class="text-sm text-yellow-700 dark:text-yellow-300 mt-2">
+                                📞 Help Desk: <strong>support@optiwatt.com</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- Notifications Tab -->
+            <div id="notificationsTab" class="settings-content hidden">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">House Goal Exceeded</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Alert when total usage exceeds limit</p>
+                        </div>
+                        <input type="checkbox" id="notifHouseGoal" onchange="toggleNotificationPref('houseGoalExceeded')" class="w-5 h-5">
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">Room Goal Exceeded</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Alert when room exceeds its goal</p>
+                        </div>
+                        <input type="checkbox" id="notifRoomGoal" onchange="toggleNotificationPref('roomGoalExceeded')" class="w-5 h-5">
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">Daily Goal Exceeded</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Alert for daily usage limit</p>
+                        </div>
+                        <input type="checkbox" id="notifDailyGoal" onchange="toggleNotificationPref('dailyGoalExceeded')" class="w-5 h-5">
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">Monthly Goal Exceeded</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Alert for monthly usage limit</p>
+                        </div>
+                        <input type="checkbox" id="notifMonthlyGoal" onchange="toggleNotificationPref('monthlyGoalExceeded')" class="w-5 h-5">
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">Room Vacancy</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Notify when room becomes vacant</p>
+                        </div>
+                        <input type="checkbox" id="notifVacancy" onchange="toggleNotificationPref('roomVacancy')" class="w-5 h-5">
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">Device Toggled</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Notify on device state changes</p>
+                        </div>
+                        <input type="checkbox" id="notifDevice" onchange="toggleNotificationPref('deviceToggled')" class="w-5 h-5">
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">System Notices</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">General system notifications</p>
+                        </div>
+                        <input type="checkbox" id="notifSystem" onchange="toggleNotificationPref('systemNotices')" class="w-5 h-5">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Logs Tab -->
+            <div id="exportLogsTab" class="settings-content hidden">
+                <div class="space-y-4">
+                    <button onclick="exportToCSV()" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-lg transition flex items-center justify-center">
+                        <span class="text-2xl mr-3">📥</span>
+                        Export Data to CSV
+                    </button>
+                    <button onclick="printReport()" class="w-full bg-secondary hover:bg-secondary/90 text-white font-bold py-4 rounded-lg transition flex items-center justify-center">
+                        <span class="text-2xl mr-3">🖨️</span>
+                        Print Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reset Tab -->
+            <div id="resetTab" class="settings-content hidden">
+                <div class="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg p-6">
+                    <h4 class="text-xl font-bold text-red-600 dark:text-red-400 mb-3">⚠️ Warning</h4>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4">
+                        This will permanently delete all your rooms, devices, and usage statistics. This action cannot be undone.
+                    </p>
+                    <button onclick="confirmResetStatistics()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-lg transition">
+                        Reset All Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script src="rooms.js"></script>
+</body>
+</html>
+

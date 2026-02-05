@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in - OptiWatt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-body">
+    <div class="auth-card auth-card-single relative">
+        <button id="themeToggleAuth" class="auth-theme-toggle" type="button">
+            <span id="themeIconAuth">🌙</span>
+            <span id="themeLabelAuth">Light Mode</span>
+        </button>
+        <a id="brandLinkAuth" class="auth-brand-center" href="index.html">
+            <img src="logo.png" alt="OptiWatt logo" class="logo-img">
+            <div>
+                <p class="text-2xl font-semibold">OptiWatt</p>
+                <p class="text-sm text-slate-500">Smart energy control</p>
+            </div>
+        </a>
+        <h1 class="text-3xl font-semibold text-slate-900 mt-8">Welcome back</h1>
+        <p class="text-slate-500 mt-2">Log in to explore dashboards, automation, and analytics.</p>
+        <form id="loginForm" onsubmit="handleLogin(event)" class="mt-8 space-y-5">
+            <div>
+                <label class="auth-label">Username</label>
+                <input type="text" id="username" class="auth-input" placeholder="Enter username" autocomplete="username" required>
+            </div>
+            <div>
+                <label class="auth-label">Password</label>
+                <input type="password" id="password" class="auth-input" placeholder="Enter password" autocomplete="current-password" required>
+            </div>
+            <button type="submit" class="btn-primary w-full">Log in to dashboard</button>
+        </form>
+        <div class="auth-hint">
+            <span class="text-sm text-slate-500">Demo credentials:</span>
+            <span class="font-semibold text-emerald-700">admin / admin</span>
+        </div>
+        <div class="auth-alt">
+            <span class="text-sm text-slate-500">Need an account?</span>
+            <a href="register.html" class="text-sm font-semibold text-emerald-600 hover:text-emerald-700">Register now</a>
+        </div>
+        <a href="index.html" class="auth-back">Back to landing</a>
+    </div>
+
+    <script>
+        function applyAuthTheme(theme) {
+            const isDark = theme === 'dark';
+            document.documentElement.classList.toggle('dark', isDark);
+            const icon = document.getElementById('themeIconAuth');
+            const label = document.getElementById('themeLabelAuth');
+            if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+            if (label) label.textContent = isDark ? 'Night Mode' : 'Light Mode';
+        }
+
+        function toggleAuthTheme() {
+            const current = localStorage.getItem('theme') || 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', next);
+            applyAuthTheme(next);
+        }
+
+        function updateBrandLink() {
+            const session = localStorage.getItem('optiwatt_session');
+            const link = document.getElementById('brandLinkAuth');
+            if (!link) return;
+            if (session) {
+                const data = JSON.parse(session);
+                if (data.expiresAt > Date.now()) {
+                    link.href = 'dashboard.html';
+                    return;
+                }
+            }
+            link.href = 'index.html';
+        }
+
+        const initialTheme = localStorage.getItem('theme') || 'light';
+        applyAuthTheme(initialTheme);
+        updateBrandLink();
+        document.getElementById('themeToggleAuth').addEventListener('click', toggleAuthTheme);
+
+        function getStoredUsers() {
+            const raw = localStorage.getItem('optiwatt_users');
+            return raw ? JSON.parse(raw) : [];
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            const users = getStoredUsers();
+            const foundUser = users.find(user => user.username === username && user.password === password);
+
+            if (username === 'admin' && password === 'admin') {
+                createSession({ username: 'Admin', email: 'admin@optiwatt.com' });
+                return;
+            }
+
+            if (foundUser) {
+                createSession({ username: foundUser.displayName || foundUser.username, email: foundUser.email });
+                return;
+            }
+
+            alert('Invalid credentials. Use admin/admin or a registered profile.');
+        }
+
+        function createSession({ username, email }) {
+            const session = {
+                username,
+                email,
+                loginTime: Date.now(),
+                expiresAt: Date.now() + (24 * 60 * 60 * 1000)
+            };
+
+            localStorage.setItem('optiwatt_session', JSON.stringify(session));
+            window.location.href = 'dashboard.html';
+        }
+
+        const session = localStorage.getItem('optiwatt_session');
+        if (session) {
+            const data = JSON.parse(session);
+            if (data.expiresAt > Date.now()) {
+                window.location.href = 'dashboard.html';
+            }
+        }
+    </script>
+</body>
+</html>

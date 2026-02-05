@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - OptiWatt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-body">
+    <div class="auth-card auth-card-single relative">
+        <button id="themeToggleAuth" class="auth-theme-toggle" type="button">
+            <span id="themeIconAuth">🌙</span>
+            <span id="themeLabelAuth">Light Mode</span>
+        </button>
+        <a id="brandLinkAuth" class="auth-brand-center" href="index.html">
+            <img src="logo.png" alt="OptiWatt logo" class="logo-img">
+            <div>
+                <p class="text-2xl font-semibold">OptiWatt</p>
+                <p class="text-sm text-slate-500">Smart energy control</p>
+            </div>
+        </a>
+        <h1 class="text-3xl font-semibold text-slate-900 mt-8">Create your profile</h1>
+        <p class="text-slate-500 mt-2">Registration is stored locally for demo purposes only.</p>
+        <form id="registerForm" onsubmit="handleRegister(event)" class="mt-8 space-y-5">
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <label class="auth-label">Full name</label>
+                    <input type="text" id="displayName" class="auth-input" placeholder="e.g. Alex Carter" required>
+                </div>
+                <div>
+                    <label class="auth-label">Username</label>
+                    <input type="text" id="username" class="auth-input" placeholder="Choose a username" required>
+                </div>
+            </div>
+            <div>
+                <label class="auth-label">Email</label>
+                <input type="email" id="email" class="auth-input" placeholder="you@example.com" autocomplete="email" required>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <label class="auth-label">Password</label>
+                    <input type="password" id="password" class="auth-input" placeholder="Minimum 6 characters" autocomplete="new-password" minlength="6" required>
+                </div>
+                <div>
+                    <label class="auth-label">Confirm password</label>
+                    <input type="password" id="confirmPassword" class="auth-input" placeholder="Re-enter password" autocomplete="new-password" minlength="6" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary w-full">Create account</button>
+        </form>
+        <div class="auth-alt">
+            <span class="text-sm text-slate-500">Already have a profile?</span>
+            <a href="login.html" class="text-sm font-semibold text-emerald-600 hover:text-emerald-700">Log in</a>
+        </div>
+        <a href="index.html" class="auth-back">Back to landing</a>
+    </div>
+
+    <script>
+        function applyAuthTheme(theme) {
+            const isDark = theme === 'dark';
+            document.documentElement.classList.toggle('dark', isDark);
+            const icon = document.getElementById('themeIconAuth');
+            const label = document.getElementById('themeLabelAuth');
+            if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+            if (label) label.textContent = isDark ? 'Night Mode' : 'Light Mode';
+        }
+
+        function toggleAuthTheme() {
+            const current = localStorage.getItem('theme') || 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', next);
+            applyAuthTheme(next);
+        }
+
+        function updateBrandLink() {
+            const session = localStorage.getItem('optiwatt_session');
+            const link = document.getElementById('brandLinkAuth');
+            if (!link) return;
+            if (session) {
+                const data = JSON.parse(session);
+                if (data.expiresAt > Date.now()) {
+                    link.href = 'dashboard.html';
+                    return;
+                }
+            }
+            link.href = 'index.html';
+        }
+
+        const initialTheme = localStorage.getItem('theme') || 'light';
+        applyAuthTheme(initialTheme);
+        updateBrandLink();
+        document.getElementById('themeToggleAuth').addEventListener('click', toggleAuthTheme);
+
+        function getStoredUsers() {
+            const raw = localStorage.getItem('optiwatt_users');
+            return raw ? JSON.parse(raw) : [];
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem('optiwatt_users', JSON.stringify(users));
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+
+            const displayName = document.getElementById('displayName').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match.');
+                return;
+            }
+
+            const users = getStoredUsers();
+            const duplicate = users.find(user => user.username === username || user.email === email);
+
+            if (duplicate) {
+                alert('That username or email already exists.');
+                return;
+            }
+
+            const newUser = {
+                displayName,
+                username,
+                email,
+                password,
+                createdAt: Date.now()
+            };
+
+            users.push(newUser);
+            saveUsers(users);
+
+            const session = {
+                username: displayName || username,
+                email,
+                loginTime: Date.now(),
+                expiresAt: Date.now() + (24 * 60 * 60 * 1000)
+            };
+
+            localStorage.setItem('optiwatt_session', JSON.stringify(session));
+            window.location.href = 'dashboard.html';
+        }
+
+        const session = localStorage.getItem('optiwatt_session');
+        if (session) {
+            const data = JSON.parse(session);
+            if (data.expiresAt > Date.now()) {
+                window.location.href = 'dashboard.html';
+            }
+        }
+    </script>
+</body>
+</html>

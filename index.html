@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OptiWatt - Smart Energy & Home Automation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="landing-body text-slate-900">
+    <div class="landing-bg">
+        <header class="container mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
+                <a id="brandLinkLanding" class="flex items-center gap-3" href="index.html">
+                    <img src="logo.png" alt="OptiWatt logo" class="logo-img">
+                    <div>
+                        <p class="text-xl font-semibold tracking-tight">OptiWatt</p>
+                        <p class="text-xs text-slate-500">Smart energy control</p>
+                    </div>
+                </a>
+                <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#workflow" class="nav-link">Workflow</a>
+                    <a href="#preview" class="nav-link">Preview</a>
+                    <a href="#faq" class="nav-link">FAQ</a>
+                </nav>
+                <div class="flex items-center gap-3">
+                    <button id="themeToggleLanding" class="theme-toggle" type="button">
+                        <span id="themeIconLanding">🌙</span>
+                        <span id="themeLabelLanding">Light Mode</span>
+                    </button>
+                    <a href="login.html" class="btn-ghost">Log in</a>
+                    <a href="register.html" class="btn-primary">Register</a>
+                </div>
+            </div>
+        </header>
+
+        <section class="container mx-auto px-6 py-14 md:py-20">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <p class="eyebrow">Home automation dashboard</p>
+                    <h1 class="hero-title">Visualize, automate, and reduce energy waste in real time.</h1>
+                    <p class="hero-subtitle">OptiWatt is a frontend showcase for smart energy monitoring. Track rooms, automate schedules, and highlight savings with a polished dashboard experience.</p>
+                    <div class="flex flex-col sm:flex-row gap-4 mt-8">
+                        <a href="login.html" class="btn-primary">Open dashboard</a>
+                        <a href="#preview" class="btn-outline">See live preview</a>
+                    </div>
+
+                </div>
+                <div class="relative">
+                    <div class="hero-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-slate-500 font-semibold">Today</p>
+                                <h3 class="text-2xl font-semibold">Energy Snapshot</h3>
+                            </div>
+                            <span class="badge">Realtime</span>
+                        </div>
+                        <div class="mt-8 grid grid-cols-2 gap-4">
+                            <div class="stat-box">
+                                <p class="stat-label">Active rooms</p>
+                                <p class="stat-value">4</p>
+                            </div>
+                            <div class="stat-box">
+                                <p class="stat-label">Load (kWh)</p>
+                                <p class="stat-value">11.8</p>
+                            </div>
+                            <div class="stat-box">
+                                <p class="stat-label">Active devices</p>
+                                <p class="stat-value">7</p>
+                            </div>
+                            <div class="stat-box">
+                                <p class="stat-label">Monthly goal</p>
+                                <p class="stat-value">450 kWh</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="floating-panel">
+                        <p class="text-xs text-slate-200/70 font-semibold">Smart Alerts</p>
+                        <p class="text-lg font-semibold">Automation window active</p>
+                        <p class="text-xs text-slate-200/70 mt-2">Scheduled sleep starts at 22:00</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <section class="container mx-auto px-6 -mt-6 md:-mt-10">
+        <div class="stats-row">
+            <div>
+                <p class="stat-label">Rooms monitored</p>
+                <p class="stat-value">12+</p>
+            </div>
+            <div>
+                <p class="stat-label">Automations ready</p>
+                <p class="stat-value">30+</p>
+            </div>
+            <div>
+                <p class="stat-label">Devices tracked</p>
+                <p class="stat-value">45+</p>
+            </div>
+            <div>
+                <p class="stat-label">Analytics views</p>
+                <p class="stat-value">4 modes</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="container mx-auto px-6 py-16">
+        <div class="section-header">
+            <p class="eyebrow">Core features</p>
+            <h2 class="section-title">Built to showcase smart control with confidence.</h2>
+            <p class="section-subtitle">Professional UI for demoing rooms, devices, and usage goals without a backend.</p>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+            <div class="feature-card">
+                <h3 class="feature-title">Room-aware monitoring</h3>
+                <p class="feature-text">Track every room, device, and load state with instant visual feedback.</p>
+            </div>
+            <div class="feature-card">
+                <h3 class="feature-title">Goal-based insights</h3>
+                <p class="feature-text">Set daily and monthly goals with progress indicators and alerts.</p>
+            </div>
+            <div class="feature-card">
+                <h3 class="feature-title">Automation rules</h3>
+                <p class="feature-text">Simulate schedules, vacancy sleep, and power policies from one panel.</p>
+            </div>
+            <div class="feature-card">
+                <h3 class="feature-title">Energy analytics</h3>
+                <p class="feature-text">Toggle hourly, daily, monthly, and yearly views with clear charts.</p>
+            </div>
+            <div class="feature-card">
+                <h3 class="feature-title">Custom alerts</h3>
+                <p class="feature-text">Demonstrate notifications for room status, device toggles, and limits.</p>
+            </div>
+            <div class="feature-card">
+                <h3 class="feature-title">Front-end only</h3>
+                <p class="feature-text">No backend required. Session logic runs locally for demo purposes.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="workflow" class="container mx-auto px-6 py-16">
+        <div class="section-header">
+            <p class="eyebrow">Workflow</p>
+            <h2 class="section-title">From login to insights in a few steps.</h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6 mt-10">
+            <div class="workflow-card">
+                <span class="workflow-step">01</span>
+                <h3 class="workflow-title">Access dashboard</h3>
+                <p class="workflow-text">Use demo credentials or create a local profile to enter the system.</p>
+            </div>
+            <div class="workflow-card">
+                <span class="workflow-step">02</span>
+                <h3 class="workflow-title">Manage rooms</h3>
+                <p class="workflow-text">Track devices, set goals, and simulate automation events.</p>
+            </div>
+            <div class="workflow-card">
+                <span class="workflow-step">03</span>
+                <h3 class="workflow-title">Showcase results</h3>
+                <p class="workflow-text">Present usage graphs, savings, and settings in one clean UI.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="preview" class="container mx-auto px-6 py-16">
+        <div class="section-header">
+            <p class="eyebrow">Dashboard preview</p>
+            <h2 class="section-title">A demo-ready dashboard for any home automation concept.</h2>
+        </div>
+        <div class="preview-panel mt-10">
+            <div>
+                <h3 class="text-2xl font-semibold">Unified control center</h3>
+                <p class="text-slate-600 mt-4">See statistics, room activity, and automation metrics in one place. Perfect for project demos and GitHub showcases.</p>
+                <div class="mt-6 flex flex-col gap-4">
+                    <div class="preview-item">
+                        <p class="font-semibold">Live usage metrics</p>
+                        <p class="text-sm text-slate-500">Charts and progress bars that update in real time.</p>
+                    </div>
+                    <div class="preview-item">
+                        <p class="font-semibold">Device management</p>
+                        <p class="text-sm text-slate-500">Toggle appliances with status indicators and energy readouts.</p>
+                    </div>
+                    <div class="preview-item">
+                        <p class="font-semibold">Settings & automation</p>
+                        <p class="text-sm text-slate-500">Configure schedules, vacancy logic, and export logs.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="preview-mock">
+                <div class="mock-header">
+                    <span>Dashboard</span>
+                    <span class="badge">Active</span>
+                </div>
+                <div class="mock-grid">
+                    <div class="mock-card">
+                        <p class="text-xs text-slate-300">Current power</p>
+                        <p class="text-xl font-semibold">832 W</p>
+                    </div>
+                    <div class="mock-card">
+                        <p class="text-xs text-slate-300">Monthly goal</p>
+                        <p class="text-xl font-semibold">450 kWh</p>
+                    </div>
+                    <div class="mock-card">
+                        <p class="text-xs text-slate-300">Active devices</p>
+                        <p class="text-xl font-semibold">7</p>
+                    </div>
+                    <div class="mock-card">
+                        <p class="text-xs text-slate-300">Est. cost</p>
+                        <p class="text-xl font-semibold">$68.90</p>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="container mx-auto px-6 py-16">
+        <div class="section-header">
+            <p class="eyebrow">FAQ</p>
+            <h2 class="section-title">Built for demos, ready for extension.</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6 mt-10">
+            <div class="faq-card">
+                <h3 class="faq-title">Is there a backend?</h3>
+                <p class="faq-text">Not yet. This UI is frontend-only, using local storage to simulate accounts and sessions.</p>
+            </div>
+            <div class="faq-card">
+                <h3 class="faq-title">Can I reuse the UI?</h3>
+                <p class="faq-text">Yes. The layout is adaptable for any smart home or energy monitoring showcase.</p>
+            </div>
+            <div class="faq-card">
+                <h3 class="faq-title">What is the demo login?</h3>
+                <p class="faq-text">Use username admin and password admin for the custom admin account.</p>
+            </div>
+            <div class="faq-card">
+                <h3 class="faq-title">Where is the dashboard?</h3>
+                <p class="faq-text">After login, the dashboard opens at dashboard.html with full demo data.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-6 py-16">
+        <div class="cta-panel">
+            <div>
+                <p class="eyebrow">Ready to present?</p>
+                <h2 class="text-3xl font-semibold">Launch the OptiWatt dashboard experience.</h2>
+                <p class="text-slate-600 mt-3">Use the demo credentials or register a local profile to explore the UI.</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="login.html" class="btn-primary">Log in</a>
+                <a href="register.html" class="btn-outline">Register</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="container mx-auto px-6 py-12 text-sm text-slate-500 border-t border-slate-200 dark:border-slate-800">
+        <div class="grid md:grid-cols-3 gap-8">
+            <div>
+                <p class="font-semibold text-slate-700 dark:text-slate-200">OptiWatt UI</p>
+                <p class="mt-2">Frontend showcase for smart home automation dashboards.</p>
+                <p class="mt-4 text-slate-500">Designed and built by Sadid Ahmed.</p>
+                <p class="mt-2 text-slate-500">Electronics lab project UI for OptiWatt.</p>
+            </div>
+            <div>
+                <p class="font-semibold text-slate-700 dark:text-slate-200">Project</p>
+                <ul class="mt-3 space-y-2">
+                    <li><a href="login.html" class="nav-link">Demo access</a></li>
+                    <li><a href="#preview" class="nav-link">Dashboard preview</a></li>
+                    <li><a href="#features" class="nav-link">Features</a></li>
+                    <li><a href="#workflow" class="nav-link">Workflow</a></li>
+                </ul>
+            </div>
+            <div>
+                <p class="font-semibold text-slate-700 dark:text-slate-200">Connect</p>
+                <div class="mt-3 flex flex-wrap gap-4">
+                    <a href="https://github.com/litch07" class="nav-link">GitHub</a>
+                    <a href="https://www.facebook.com/litch07" class="nav-link">Facebook</a>
+                    <a href="https://www.linkedin.com/in/sadidahmed" class="nav-link">LinkedIn</a>
+                </div>
+                <p class="mt-4 text-xs text-slate-400">© 2025 OptiWatt UI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function applyLandingTheme(theme) {
+            const isDark = theme === 'dark';
+            document.documentElement.classList.toggle('dark', isDark);
+            const icon = document.getElementById('themeIconLanding');
+            const label = document.getElementById('themeLabelLanding');
+            if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+            if (label) label.textContent = isDark ? 'Night Mode' : 'Light Mode';
+        }
+
+        function toggleLandingTheme() {
+            const current = localStorage.getItem('theme') || 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', next);
+            applyLandingTheme(next);
+        }
+
+        function updateBrandLink() {
+            const session = localStorage.getItem('optiwatt_session');
+            const link = document.getElementById('brandLinkLanding');
+            if (!link) return;
+            if (session) {
+                const data = JSON.parse(session);
+                if (data.expiresAt > Date.now()) {
+                    link.href = 'dashboard.html';
+                    return;
+                }
+            }
+            link.href = 'index.html';
+        }
+
+        const initialTheme = localStorage.getItem('theme') || 'light';
+        applyLandingTheme(initialTheme);
+        updateBrandLink();
+        document.getElementById('themeToggleLanding').addEventListener('click', toggleLandingTheme);
+    </script>
+</body>
+</html>

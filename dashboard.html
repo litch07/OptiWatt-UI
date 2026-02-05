@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OptiWatt - Smart Energy Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+
+<!-- Login Alert -->
+<div id="loginAlert" class="hidden fixed top-20 right-4 z-50 max-w-md bg-white dark:bg-gray-800 border border-primary shadow-2xl rounded-xl p-6 fade-in">
+    <button onclick="this.parentElement.classList.add('hidden')" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl">&times;</button>
+    <div class="flex items-start space-x-3">
+        <div class="text-3xl">👋</div>
+        <div>
+            <h4 class="text-lg font-bold text-gray-800 dark:text-white">Welcome back!</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Last login: <span id="lastLoginTime"></span></p>
+        </div>
+    </div>
+</div>
+
+<!-- Achievement Banner -->
+<div id="achievementBanner" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-gradient-to-r from-primary to-secondary text-white p-8 rounded-xl shadow-2xl animate-bounce-in">
+    <h2 class="text-3xl font-bold">🎉 Achievement Unlocked!</h2>
+    <p id="achievementText" class="text-lg mt-2"></p>
+</div>
+
+<!-- Global Header -->
+<header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40">
+    <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+            <a id="brandLink" href="dashboard.html" class="flex items-center space-x-3">
+                <img src="logo.png" alt="OptiWatt logo" class="logo-img">
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">OptiWatt</h1>
+            </a>
+            <div class="flex items-center space-x-2 md:space-x-3">
+                <!-- Theme Toggle -->
+                <button id="themeToggle" onclick="toggleTheme()" class="header-icon-btn" title="Toggle Theme">
+                    <span class="icon-size">🌙</span>
+                    <span class="header-icon-label" id="themeLabel">Light Mode</span>
+                </button>
+                <!-- Notifications -->
+                <button onclick="toggleNotificationsPanel()" class="header-icon-btn relative" title="Notifications">
+                    <span class="icon-size">🔔</span>
+                    <span class="header-icon-label">Notifications</span>
+                </button>
+                <!-- Settings -->
+                <button onclick="openSettingsModal()" class="header-icon-btn" title="Settings">
+                    <span class="icon-size">⚙️</span>
+                    <span class="header-icon-label">Settings</span>
+                </button>
+                <!-- Profile -->
+                <button id="profileMenuBtn" onclick="toggleProfileMenu()" class="header-icon-btn" title="Profile" aria-expanded="false">
+                    <span class="icon-size">👤</span>
+                    <span class="header-icon-label">Profile</span>
+                </button>
+                <div id="profileMenu" class="hidden absolute top-20 right-4 bg-white dark:bg-gray-800 rounded-xl shadow-xl p-4 border border-gray-200 dark:border-gray-700 z-50">
+                    <div class="flex items-center space-x-3 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                        <div class="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-xl">A</div>
+                        <div>
+                            <p id="profileName" class="font-bold text-gray-800 dark:text-white">Admin</p>
+                            <p id="profileEmail" class="text-sm text-gray-600 dark:text-gray-400">admin@example.com</p>
+                        </div>
+                    </div>
+                    <button onclick="confirmLogout()" class="w-full text-left px-4 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 font-semibold transition">🚪 Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Notifications Panel -->
+<div id="notificationsPanel" class="hidden fixed top-20 right-4 z-50 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4">
+    <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-3">📬 Notifications</h3>
+    <div class="space-y-2 max-h-96 overflow-y-auto">
+        <p class="text-gray-600 dark:text-gray-400 text-sm">No new notifications</p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<main class="container mx-auto px-4 py-8">
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Rooms -->
+        <div onclick="window.location.href='rooms.html'" class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition cursor-pointer">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm font-semibold">Total Rooms</p>
+                    <p id="totalRooms" class="text-4xl font-bold text-primary mt-2">0</p>
+                </div>
+                <div class="text-5xl">🏠</div>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-xs mt-2">Click to manage rooms</p>
+        </div>
+
+        <!-- Active Appliances -->
+        <div onclick="window.location.href='devices.html'" class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition cursor-pointer">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm font-semibold">Active Appliances</p>
+                    <p id="activeAppliances" class="text-4xl font-bold text-secondary mt-2">0</p>
+                </div>
+                <div class="text-5xl">💡</div>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-xs mt-2">Click to view appliances</p>
+        </div>
+
+        <!-- Current Power -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm font-semibold">Current Power</p>
+                    <p id="currentPower" class="text-4xl font-bold text-accent mt-2">0 W</p>
+                </div>
+                <div class="text-5xl">⚡</div>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-xs mt-2">Real-time consumption</p>
+        </div>
+
+        <!-- Estimated Monthly Cost -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm font-semibold">Estimated Monthly Cost</p>
+                    <p id="estimatedCost" class="text-4xl font-bold text-danger mt-2">$0.00</p>
+                </div>
+                <div class="text-5xl">💵</div>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-xs mt-2">Based on current usage</p>
+        </div>
+    </div>
+
+    <!-- Usage Cards -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Today's Usage -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white">📅 Today's Usage</h2>
+                <button onclick="openEditGoalModal('daily')" class="text-primary hover:text-primary/80 text-sm font-semibold">Edit Goal</button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-600 dark:text-gray-400">Daily Goal</span>
+                        <span class="font-bold text-gray-800 dark:text-white"><span id="dailyGoalDisplay">15.0</span> kWh</span>
+                    </div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">≈ $<span id="dailyGoalCost">2.25</span></div>
+                </div>
+                <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
+                    <div id="todayBar" class="bg-primary h-full transition-all duration-500 progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span id="todayProgress" class="text-gray-600 dark:text-gray-400">0/15.0 kWh</span>
+                    <span id="todayStatus" class="font-semibold text-primary">On track</span>
+                </div>
+                <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-400">Today's Usage:</span>
+                        <span class="text-2xl font-bold text-gray-800 dark:text-white"><span id="todayKwh">0.00</span> kWh</span>
+                    </div>
+                    <div class="text-right text-sm text-gray-500 dark:text-gray-400 mt-1">≈ $<span id="todayCost">0.00</span></div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">✓ Calculated based on per-kWh cost</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- This Month's Usage -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white">📊 This Month's Usage</h2>
+                <button onclick="openEditGoalModal('monthly')" class="text-primary hover:text-primary/80 text-sm font-semibold">Edit Goal</button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-600 dark:text-gray-400">Monthly Goal</span>
+                        <span class="font-bold text-gray-800 dark:text-white"><span id="monthlyGoalDisplay">450</span> kWh</span>
+                    </div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">≈ $<span id="monthlyGoalCost">67.50</span></div>
+                </div>
+                <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
+                    <div id="monthBar" class="bg-secondary h-full transition-all duration-500 progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span id="monthProgress" class="text-gray-600 dark:text-gray-400">0/450 kWh</span>
+                    <span id="monthStatus" class="font-semibold text-primary">On track</span>
+                </div>
+                <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-400">Month's Usage:</span>
+                        <span class="text-2xl font-bold text-gray-800 dark:text-white"><span id="monthKwh">0.00</span> kWh</span>
+                    </div>
+                    <div class="text-right text-sm text-gray-500 dark:text-gray-400 mt-1">≈ $<span id="monthCost">0.00</span></div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">✓ Calculated based on per-kWh cost</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Energy Analytics (FIXED Layout) -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">📈 Energy Analytics</h2>
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex space-x-2 overflow-x-auto">
+                <button onclick="switchGraphView('hourly')" class="graph-tab" data-view="hourly">Hourly</button>
+                <button onclick="switchGraphView('daily')" class="graph-tab active" data-view="daily">Daily</button>
+                <button onclick="switchGraphView('monthly')" class="graph-tab" data-view="monthly">Monthly</button>
+                <button onclick="switchGraphView('yearly')" class="graph-tab" data-view="yearly">Yearly</button>
+            </div>
+            <!-- Year Selector (FIXED - right side of Yearly tab) -->
+            <div id="yearSelectorContainer" class="hidden">
+                <select id="yearSelector" onchange="changeSelectedYear()" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-sm"></select>
+            </div>
+        </div>
+        <div class="relative" style="height: 300px;">
+            <canvas id="energyChart"></canvas>
+        </div>
+        <!-- Chart Description (FIXED - below graph) -->
+        <p id="chartDescription" class="text-sm text-gray-600 dark:text-gray-400 mt-4 text-center">Daily energy usage for the past 7 days</p>
+    </div>
+
+
+<!-- Settings Modal -->
+<div id="settingsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="settings-modal-container">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gray-50 dark:bg-gray-900 p-6 overflow-y-auto">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-6">⚙️ Settings</h2>
+            <div class="space-y-2">
+                <button onclick="switchSettingsTab('password')" class="settings-tab-btn active" data-tab="password">
+                    <span class="mr-3 text-xl">🔒</span> Password
+                </button>
+                <button onclick="switchSettingsTab('automation')" class="settings-tab-btn" data-tab="automation">
+                    <span class="mr-3 text-xl">🤖</span> Automation
+                </button>
+                <button onclick="switchSettingsTab('energyCost')" class="settings-tab-btn" data-tab="energyCost">
+                    <span class="mr-3 text-xl">💰</span> Energy Cost
+                </button>
+                <button onclick="switchSettingsTab('notifications')" class="settings-tab-btn" data-tab="notifications">
+                    <span class="mr-3 text-xl">🔔</span> Notifications
+                </button>
+                <button onclick="switchSettingsTab('exportLogs')" class="settings-tab-btn" data-tab="exportLogs">
+                    <span class="mr-3 text-xl">📊</span> Export Logs
+                </button>
+                <button onclick="switchSettingsTab('reset')" class="settings-tab-btn" data-tab="reset">
+                    <span class="mr-3 text-xl">🔄</span> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 bg-white dark:bg-gray-800 p-8 overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="settingsTitle" class="text-2xl font-bold text-gray-800 dark:text-white">Password</h3>
+                <button onclick="closeSettingsModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-3xl">&times;</button>
+            </div>
+
+            <!-- Password Tab -->
+            <div id="passwordTab" class="settings-content">
+                <form id="passwordForm" onsubmit="changePassword(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Current Password</label>
+                        <input type="password" id="currentPassword" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">New Password</label>
+                        <input type="password" id="newPassword" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required minlength="6">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required minlength="6">
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg transition">
+                        Change Password
+                    </button>
+                </form>
+            </div>
+
+            <!-- Automation Tab (FIXED Layout) -->
+    <div id="automationTab" class="settings-content hidden">
+        <div class="space-y-4">
+            <!-- Global Automation (FIXED - consistent with other items) -->
+            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <div>
+                    <h4 class="font-bold text-gray-800 dark:text-white">Global Automation</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Enable smart automation features</p>
+                </div>
+                <div id="globalAutomationToggle" class="toggle-switch" onclick="toggleGlobalAutomation()"></div>
+            </div>
+
+            <!-- Vacancy Sleep -->
+            <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <div>
+                        <h4 class="font-bold text-gray-800 dark:text-white">Vacancy Sleep</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Auto-sleep devices in vacant rooms</p>
+                    </div>
+                    <div id="vacancySleepToggle" class="toggle-switch" onclick="toggleVacancySleep()"></div>
+                </div>
+                <div id="vacancyTimer" class="mt-4 hidden">
+                    <label class="text-sm text-gray-600 dark:text-gray-400">Delay: <span id="vacancyTimerValue">10</span> minutes</label>
+                    <input type="range" min="5" max="60" step="5" value="10" oninput="updateVacancyTimer(this.value)" class="w-full mt-2">
+                </div>
+            </div>
+
+            <!-- Scheduled Sleep -->
+            <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <div>
+                        <h4 class="font-bold text-gray-800 dark:text-white">Scheduled Sleep</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Auto-sleep during specific hours</p>
+                    </div>
+                    <div id="scheduledSleepToggle" class="toggle-switch" onclick="toggleScheduledSleep()"></div>
+                </div>
+                <div id="scheduledSleepConfig" class="mt-4 hidden space-y-3">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm text-gray-600 dark:text-gray-400">Start Time</label>
+                            <input type="time" id="sleepStartTime" value="22:00" onchange="updateSleepSchedule()" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white mt-1">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600 dark:text-gray-400">End Time</label>
+                            <input type="time" id="sleepEndTime" value="06:00" onchange="updateSleepSchedule()" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white mt-1">
+                        </div>
+                    </div>
+                    <button onclick="toggleExemptionsSection()" class="text-primary hover:text-primary/80 text-sm font-semibold">
+                        Manage Device Exemptions
+                    </button>
+                    <div id="sleepExemptions" class="hidden mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                        <h5 class="font-semibold text-gray-800 dark:text-white mb-3">Exempt Devices</h5>
+                        <div id="sleepExemptDevicesList" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+                <!-- Energy Cost Tab -->
+                <div id="energyCostTab" class="settings-content hidden">
+                    <div class="p-6 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-gray-800 dark:text-white">Current Rate</h4>
+                            <span class="text-3xl font-bold text-primary">$0.15 <span class="text-base text-gray-600 dark:text-gray-400">/ kWh</span></span>
+                        </div>
+                        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mt-4">
+                            <p class="text-sm text-yellow-800 dark:text-yellow-200">
+                                <strong>Note:</strong> Energy costs are currently fixed. To update pricing, please contact the help desk.
+                            </p>
+                            <p class="text-sm text-yellow-700 dark:text-yellow-300 mt-2">
+                                📞 Help Desk: <strong>support@optiwatt.com</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- Notifications Tab -->
+            <div id="notificationsTab" class="settings-content hidden">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">House Goal Exceeded</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Alert when total usage exceeds limit</p>
+                        </div>
+                        <input type="checkbox" id="notifHouseGoal" onchange="toggleNotificationPref('houseGoalExceeded')" class="w-5 h-5">
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">Room Goal Exceeded</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Alert when room exceeds its goal</p>
+                        </div>
+                        <input type="checkbox" id="notifRoomGoal" onchange="toggleNotificationPref('roomGoalExceeded')" class="w-5 h-5">
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">Daily Goal Exceeded</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Alert for daily usage limit</p>
+                        </div>
+                        <input type="checkbox" id="notifDailyGoal" onchange="toggleNotificationPref('dailyGoalExceeded')" class="w-5 h-5">
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">Monthly Goal Exceeded</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Alert for monthly usage limit</p>
+                        </div>
+                        <input type="checkbox" id="notifMonthlyGoal" onchange="toggleNotificationPref('monthlyGoalExceeded')" class="w-5 h-5">
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">Room Vacancy</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Notify when room becomes vacant</p>
+                        </div>
+                        <input type="checkbox" id="notifVacancy" onchange="toggleNotificationPref('roomVacancy')" class="w-5 h-5">
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">Device Toggled</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Notify on device state changes</p>
+                        </div>
+                        <input type="checkbox" id="notifDevice" onchange="toggleNotificationPref('deviceToggled')" class="w-5 h-5">
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">System Notices</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">General system notifications</p>
+                        </div>
+                        <input type="checkbox" id="notifSystem" onchange="toggleNotificationPref('systemNotices')" class="w-5 h-5">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Logs Tab -->
+            <div id="exportLogsTab" class="settings-content hidden">
+                <div class="space-y-4">
+                    <button onclick="exportToCSV()" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-lg transition flex items-center justify-center">
+                        <span class="text-2xl mr-3">📥</span>
+                        Export Data to CSV
+                    </button>
+                    <button onclick="printReport()" class="w-full bg-secondary hover:bg-secondary/90 text-white font-bold py-4 rounded-lg transition flex items-center justify-center">
+                        <span class="text-2xl mr-3">🖨️</span>
+                        Print Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reset Tab -->
+            <div id="resetTab" class="settings-content hidden">
+                <div class="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg p-6">
+                    <h4 class="text-xl font-bold text-red-600 dark:text-red-400 mb-3">⚠️ Warning</h4>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4">
+                        This will permanently delete all your rooms, devices, and usage statistics. This action cannot be undone.
+                    </p>
+                    <button onclick="confirmResetStatistics()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-lg transition">
+                        Reset All Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Goal Modal (FIXED - Dollar-based input) -->
+<div id="editGoalModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-md w-full">
+        <h3 id="editGoalTitle" class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Edit Goal</h3>
+        <form id="editGoalForm" onsubmit="saveGoal(event)">
+            <!-- Tab Selector -->
+            <div class="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 mb-4">
+                <button type="button" onclick="switchGoalInputType('kwh')" id="goalInputTypeKwh" class="flex-1 px-4 py-2 rounded-md font-semibold transition bg-white dark:bg-gray-600 text-gray-800 dark:text-white">kWh</button>
+                <button type="button" onclick="switchGoalInputType('dollar')" id="goalInputTypeDollar" class="flex-1 px-4 py-2 rounded-md font-semibold transition text-gray-600 dark:text-gray-400">Dollar ($)</button>
+            </div>
+            
+            <!-- kWh Input -->
+            <div id="goalInputKwhSection" class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Goal (kWh)</label>
+                <input type="number" id="goalInputKwh" step="0.1" min="0" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" required>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">≈ $<span id="goalKwhToDollar">0.00</span></p>
+            </div>
+            
+            <!-- Dollar Input -->
+            <div id="goalInputDollarSection" class="mb-6 hidden">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Goal ($)</label>
+                <input type="number" id="goalInputDollar" step="0.01" min="0" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">≈ <span id="goalDollarToKwh">0.0</span> kWh</p>
+            </div>
+            
+            <div class="flex space-x-4">
+                <button type="button" onclick="closeEditGoalModal()" class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 transition">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
